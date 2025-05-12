@@ -1,0 +1,24 @@
+# Ignorar entorno virtual
+.venv/
+venv/
+env/
+
+# Ignorar archivos de caché de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ignorar archivos de distribución
+dist/
+build/
+*.egg-info/
+
+# Ignorar archivos de configuración local
+.env
+.DS_Store
+
+# Ignorar archivos de Jupyter Notebook
+.ipynb_checkpoints
+
+# Ignorar archivos generados por matplotlib
+*.png
