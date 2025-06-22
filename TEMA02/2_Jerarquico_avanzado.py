@@ -11,8 +11,6 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import silhouette_score
 from scipy.cluster.hierarchy import dendrogram, linkage, fcluster
 from scipy.spatial.distance import pdist, squareform
-import yfinance as yf
-from datetime import datetime, timedelta
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -194,16 +192,46 @@ plt.show()
 # ------------------------------------------------------------------------------
 print("\n5. Matrices de distancia personalizadas")
 
-# Descargamos datos financieros
-print("Descargando datos financieros...")
-end_date = datetime.now()
-start_date = end_date - timedelta(days=365)  # Datos de un año
+# Generamos datos financieros sintéticos
+print("Generando datos financieros sintéticos...")
+np.random.seed(42)
 
+# Lista de acciones
 tickers = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'TSLA', 'NVDA', 'JPM', 'V', 'WMT']
-data = yf.download(tickers, start=start_date, end=end_date)['Adj Close']
 
-# Calculamos los rendimientos diarios
-returns = data.pct_change().dropna()
+# Generamos rendimientos diarios sintéticos (252 días de trading)
+n_days = 252
+
+# Creamos rendimientos correlacionados para simular acciones del mismo sector
+# Tecnología: AAPL, MSFT, GOOGL, META, NVDA
+# Comercio: AMZN, WMT
+# Financiero: JPM, V
+# Otros: TSLA
+
+# Matriz de correlación base
+corr_base = np.array([
+    # AAPL MSFT GOOGL AMZN META TSLA NVDA  JPM   V   WMT
+    [1.0, 0.7, 0.6,  0.5, 0.6, 0.4, 0.7, 0.3, 0.3, 0.2],  # AAPL
+    [0.7, 1.0, 0.7,  0.5, 0.6, 0.4, 0.6, 0.3, 0.3, 0.2],  # MSFT
+    [0.6, 0.7, 1.0,  0.5, 0.7, 0.4, 0.6, 0.2, 0.2, 0.2],  # GOOGL
+    [0.5, 0.5, 0.5,  1.0, 0.5, 0.3, 0.4, 0.3, 0.3, 0.6],  # AMZN
+    [0.6, 0.6, 0.7,  0.5, 1.0, 0.4, 0.6, 0.2, 0.2, 0.3],  # META
+    [0.4, 0.4, 0.4,  0.3, 0.4, 1.0, 0.5, 0.2, 0.2, 0.2],  # TSLA
+    [0.7, 0.6, 0.6,  0.4, 0.6, 0.5, 1.0, 0.3, 0.3, 0.2],  # NVDA
+    [0.3, 0.3, 0.2,  0.3, 0.2, 0.2, 0.3, 1.0, 0.7, 0.3],  # JPM
+    [0.3, 0.3, 0.2,  0.3, 0.2, 0.2, 0.3, 0.7, 1.0, 0.3],  # V
+    [0.2, 0.2, 0.2,  0.6, 0.3, 0.2, 0.2, 0.3, 0.3, 1.0]   # WMT
+])
+
+# Generamos rendimientos correlacionados
+returns_data = np.random.multivariate_normal(
+    mean=[0.0005] * len(tickers),  # Rendimiento diario promedio
+    cov=corr_base * 0.0004,        # Matriz de covarianza
+    size=n_days
+)
+
+# Convertimos a DataFrame
+returns = pd.DataFrame(returns_data, columns=tickers)
 
 print(f"Datos financieros: {returns.shape[0]} días, {returns.shape[1]} acciones")
 print(f"Acciones: {', '.join(tickers)}")
